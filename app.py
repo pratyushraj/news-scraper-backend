@@ -54,6 +54,16 @@ def scrape_ndtv():
             })
     return articles
 
+@app.route('/news', methods=['GET'])
+def get_news():
+    source = request.args.get('source', 'ndtv')
+    category = request.args.get('category', 'top')
+    if source == 'ndtv':
+        articles = scrape_ndtv(category)
+    else:
+        articles = []
+    return jsonify(articles)
+
 def scrape_bbc():
     url = "https://www.bbc.com/news"
     r = requests.get(url)
@@ -69,6 +79,17 @@ def scrape_bbc():
                 "url": link
             })
     return articles
+
+def scrape_ndtv(category='top'):
+    base_urls = {
+        'top': 'https://www.ndtv.com/latest',
+        'business': 'https://www.ndtv.com/business/latest',
+        'sports': 'https://sports.ndtv.com/latest',
+        'technology': 'https://www.ndtv.com/technology/latest',
+        # Add more as needed
+    }
+    url = base_urls.get(category, base_urls['top'])
+    # ...rest of your scraping logic...
 
 @app.route('/news', methods=['GET'])
 def get_news():
