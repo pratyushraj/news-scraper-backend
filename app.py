@@ -11,16 +11,25 @@ def scrape_ndtv():
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
     articles = []
-    for item in soup.select(".news_Itm"):
-        title = item.select_one(".newsHdng")
-        summary = item.select_one(".newsCont")
-        link = title.a['href'] if title and title.a else None
-        if title and summary and link:
-            articles.append({
-                "title": title.get_text(strip=True),
-                "summary": summary.get_text(strip=True),
-                "url": link
-            })
+    
+    # Look for news items with the correct class
+    for item in soup.select(".NwsLstPg_txt-cnt"):
+        title_element = item.select_one(".NwsLstPg_ttl-lnk")
+        if title_element:
+            title = title_element.get_text(strip=True)
+            link = title_element.get('href')
+            
+            # Get summary from the same container
+            summary_element = item.select_one(".NwsLstPg_smmry")
+            summary = summary_element.get_text(strip=True) if summary_element else ""
+            
+            if title and link:
+                articles.append({
+                    "title": title,
+                    "summary": summary,
+                    "url": link
+                })
+    
     return articles
 
 def scrape_bbc():
