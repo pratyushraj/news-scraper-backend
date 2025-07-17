@@ -32,6 +32,28 @@ def scrape_ndtv():
     
     return articles
 
+def scrape_ndtv():
+    url = "https://www.ndtv.com/latest"
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, "html.parser")
+    articles = []
+    for card in soup.select(".NwsLstPg_txt-cnt"):
+        title_element = card.select_one(".NwsLstPg_ttl-lnk")
+        img_element = card.find_previous_sibling("a", class_="NwsLstPg_img")
+        summary_element = card.select_one(".NwsLstPg_smmry")
+        title = title_element.get_text(strip=True) if title_element else ""
+        link = title_element.get('href') if title_element else ""
+        summary = summary_element.get_text(strip=True) if summary_element else ""
+        image = img_element.img['src'] if img_element and img_element.img else ""
+        if title and link:
+            articles.append({
+                "title": title,
+                "summary": summary,
+                "url": link,
+                "image": image
+            })
+    return articles
+
 def scrape_bbc():
     url = "https://www.bbc.com/news"
     r = requests.get(url)
